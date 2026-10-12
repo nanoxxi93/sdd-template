@@ -45,6 +45,7 @@ def check_constitution():
             "name": r["name"],
             "pattern": re.compile(r["pattern"]),
             "extensions": r.get("extensions", []),
+            "target_directory": r.get("target_directory"),
             "message": r.get("message", "Infracción a las reglas de la constitución.")
         })
 
@@ -64,10 +65,19 @@ def check_constitution():
             
             for file in files:
                 file_path = os.path.join(root, file)
+                norm_file_path = file_path.replace("\\", "/")
                 _, ext = os.path.splitext(file)
                 
-                # Filtrar si alguna regla aplica a esta extensión
-                applicable_rules = [r for r in compiled_rules if not r["extensions"] or ext in r["extensions"]]
+                # Filtrar si alguna regla aplica a esta extensión y ruta
+                applicable_rules = []
+                for r in compiled_rules:
+                    # Si la regla restringe el directorio objetivo
+                    rule_dir = r.get("target_directory")
+                    if rule_dir and rule_dir.replace("\\", "/") not in norm_file_path:
+                        continue
+                    if not r["extensions"] or ext in r["extensions"]:
+                        applicable_rules.append(r)
+
                 if not applicable_rules:
                     continue
                 
