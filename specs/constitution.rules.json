@@ -12,6 +12,12 @@
       "pattern": "console\\.log\\(",
       "extensions": [".js", ".ts", ".jsx", ".tsx", ".vue"],
       "message": "Infracción de la Constitución: console.log() detectado. Usa un logger estructurado o elimínalo antes de commit."
+    },
+    {
+      "name": "Evitar alert() intrusivo en cliente",
+      "pattern": "\\balert\\(",
+      "extensions": [".js", ".ts", ".jsx", ".tsx", ".vue"],
+      "message": "Infracción de la Constitución: alert() intrusivo detectado. Usa componentes de feedback contextual no bloqueantes (notificaciones inline, toasts o skeletons)."
     }
   ]
 }

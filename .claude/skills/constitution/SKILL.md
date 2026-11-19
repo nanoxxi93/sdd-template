@@ -9,29 +9,35 @@ Esta skill instruye al agente a aplicar y respetar la constitución del proyecto
 
 ## El archivo de constitución
 
-Un archivo de constitución captura principios, restricciones y estándares no negociables que rigen el proyecto. También sirve como barandilla para el desarrollo asistido por IA. 
+Un archivo de constitución captura principios, restricciones y estándares no negociables que rigen el proyecto. Sirve como barandilla inquebrantable para el desarrollo asistido por IA. 
 
-Cuando el agente genera especificaciones, planes, tareas o código, **debe hacer referencia a la constitución** para comprobar que las propuestas cumplen con sus estándares. Para proyectos brownfield, documenta los patrones y restricciones arquitectónicos existentes.
+Cuando el agente genera especificaciones, planes, tareas o código, **debe hacer referencia a la constitución** para comprobar que las propuestas cumplen con sus estándares.
 
-## Ventajas principales
+---
 
-- **Aplicación de la coherencia:** Garantiza la alineación con las decisiones arquitectónicas durante proyectos largos con varios desarrolladores.
-- **Documentación de cumplimiento:** Hace que los requisitos normativos y las directivas de seguridad sean explícitos y auditables.
-- **Captura de conocimientos institucionales:** Conserva las lecciones ganadas de forma que guía la generación de código de inteligencia artificial.
-- **Carga cognitiva reducida:** Automatiza la aplicación de directivas organizativas durante el desarrollo.
+## Principios y Estándares Innegociables
 
-## Estructura de la Constitución
+Las directivas obligatorias contenidas en `/specs/constitution.md` abarcan:
 
-Una constitución bien estructurada organiza los principios en categorías a las que los asistentes de inteligencia artificial pueden hacer referencia fácilmente. Las secciones comunes que contiene `/specs/constitution.md` son:
+1. **Estándares Tecnológicos y Dependencias:**
+   - Auditoría obligatoria de versiones estables más recientes (`latest stable` o LTS vigente) antes de proponer paquetes o scaffolding. Prohibido usar librerías desactualizadas o incompatibles.
+2. **Resiliencia y Conectividad:**
+   - Tolerancia a desconexión, degradación elegante y reintentos pasivos en background con backoff exponencial y jitter (sin congelar la UI).
+3. **Experiencia de Usuario (UX) y Frontend:**
+   - Pantallas y componentes con *Skeletons* estructurales para cargas asíncronas y *empty states* descriptivos.
+   - Protección activa contra pérdida de datos en formularios: detección de cambios sin guardar (*dirty state*) con advertencia al salir y auto-guardado de borradores temporales.
+4. **Seguridad y Control de Abusos:**
+   - Validación estricta con esquemas en cliente y servicios.
+   - Prevención de doble clic mediante debounce/deshabilitación en botones de envío.
+   - Límites de tasa (*rate-limiting*) en llamadas críticas y aislamiento seguro de credenciales.
+5. **Estándares de Codificación:**
+   - Test-Driven Development (TDD): pruebas primero.
+   - Desglose de tareas en grupos pequeños para permitir revisión incremental y commits parciales.
 
-- **Estándares tecnológicos:** Se usan para especificar tecnologías, plataformas y marcos aprobados.
-- **Requisitos de seguridad:** Se pueden usar para definir elementos como autenticación, autorización, cifrado y reglas de protección de datos.
-- **Rendimiento y escalabilidad:** Se usan para establecer expectativas para el comportamiento del sistema bajo carga.
-- **Estándares de codificación:** Proporcionan requisitos que ayudan a garantizar la calidad del código.
-- **Cumplimiento y gobernanza:** Se utilizan para documentar los requisitos normativos y de políticas internas.
+---
 
 ## Instrucciones para el Agente
 
 1. **Validación:** Antes de proponer una nueva arquitectura, escribir especificaciones o generar código, lee `/specs/constitution.md` y verifica que la propuesta cumple con las reglas descritas.
-2. **Defensa de los estándares:** Si se propone algo que entra en conflicto con la constitución, señala la violación de los estándares documentados.
-3. **Mantenimiento:** Si se acuerdan nuevas reglas o restricciones innegociables durante el proyecto, sugiere añadirlas a `/specs/constitution.md`.
+2. **Defensa de los estándares:** Si se propone algo que entra en conflicto con la constitución (ej. componentes sin skeleton, peticiones sin reintentos o paquetes desactualizados), señala la violación de inmediato y propón la solución alineada.
+3. **Mantenimiento:** Si se acuerdan nuevas reglas o restricciones innegociables durante el proyecto, agrégalas a `/specs/constitution.md`.

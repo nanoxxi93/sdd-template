@@ -11,6 +11,8 @@ PLACEHOLDERS = [
 
 TARGET_FILES = [
     "README.md",
+    "AGENTS.md",
+    "GEMINI.md",
     "CLAUDE.md",
     "specs/constitution.md",
     "specs/mission.md",
@@ -21,6 +23,7 @@ TARGET_FILES = [
 def init_project():
     print("=" * 60)
     print(" Inicializador de Proyecto - Spec-Driven Development (SDD)")
+    print(" Soporte Multi-Harness: Antigravity, OpenAI Codex y Claude")
     print("=" * 60)
     
     values = {}
@@ -57,7 +60,11 @@ def init_project():
             print(f"[X] Error en {rel_path}: {e}")
 
     print(f"\nInicialización completada. Archivos actualizados: {modified}.")
-    print("Recuerda revisar specs/constitution.md y specs/tech-stack.md para afinar detalles.")
+    print("Recuerda:")
+    print("1. Revisar specs/constitution.md y specs/tech-stack.md para afinar detalles.")
+    print("2. Al crear scaffolding, auditar dependencias contra sus versiones 'latest stable' vigentes.")
+    print("3. Estructurar el roadmap en subfases consistentes por módulo o por capa.")
+    print("4. Ejecutar 'python scripts/sync_skills.py' si añades o editas skills.")
 
 if __name__ == "__main__":
     init_project()

@@ -1,32 +1,92 @@
 ---
 name: clarify
-description: Analiza una especificación existente para identificar ambigüedades, suposiciones, lagunas y casos extremos infraespecificados. Actúa como un analista experimentado que refina la especificación antes de la implementación.
+description: Audita y refina exhaustivamente una especificación (spec.md) en una sola pasada de 360°, evaluando escenarios "¿Qué pasaría si...?" y entregando un reporte explicativo y fundamentado para la toma de decisiones, evitando ciclos interminables de preguntas.
 ---
 
-# Clarificar una especificación (Refinamiento SDD)
+# Clarificar y Refinar una Especificación (Refinamiento Exhaustivo SDD)
 
-Esta skill se usa en el desarrollo controlado por especificaciones (SDD) para auditar y refinar una especificación (`spec.md`) **antes** de que comience la implementación. El objetivo es detectar problemas de forma temprana, actuando como un analista de producto/sistemas experimentado.
+Esta skill audita y refina una especificación (`spec.md`) **antes** de pasar al diseño técnico (`plan.md`). 
 
-## 1. Análisis de la especificación
+**OBJETIVOS CLAVE:**
+1. **CERO RONDAS INFINITAS (Auditoría Exhaustiva en 1 Sola Pasada):** Escaneo integral y consolidado de una sola vez.
+2. **REPORTE EXPLICATIVO Y FUNDAMENTADO:** Cada hallazgo explica el *por qué* importa, los riesgos, las opciones y el motivo de la recomendación para que el usuario tome decisiones informadas con criterio.
+3. **EVALUACIÓN SISTEMÁTICA DEL "¿QUÉ PASARÍA SÍ...?":** Detección proactiva de escenarios de contingencia, estrés y fallos antes de que lleguen a código.
 
-Al invocar esta skill, debes leer la especificación objetivo y evaluarla rigurosamente contra los siguientes criterios:
+---
 
-- **Ambigüedades**: Busca palabras vagas o imprecisas (ej. "rápido", "a veces", "muchos", "adecuado") y señala que necesitan ser reemplazadas por valores exactos y medibles.
-- **Lagunas (Gaps) y Detalles Faltantes**: Identifica estados no manejados. Por ejemplo: estados vacíos, estados de carga, paginación, límites de caracteres, respuestas de error específicas.
-- **Suposiciones**: Detecta decisiones implícitas que no están escritas pero que el desarrollador tendría que tomar por su cuenta (ej. "el sistema envía un email"... ¿con qué plantilla?, ¿desde qué dirección?).
-- **Casos Extremos (Edge Cases) Infraespecificados**: Pregúntate qué pasa si: la red se cae a la mitad, el token expira justo antes de guardar, el usuario introduce datos inválidos o extremos, o hay intentos concurrentes.
-- **Incoherencias de Terminología**: Verifica que los términos se usen de manera consistente a lo largo de todo el documento.
-- **Alineación Estratégica**: Asegúrate de que no haya conflictos ocultos con las reglas de `specs/constitution.md` o la visión de `specs/mission.md`.
+## 0. Paso Previo: Control de Dimensionalidad y Desglose de Roadmap
 
-## 2. Interacción con el usuario
+Antes de iniciar la auditoría de detalle:
+1. Evalúa el alcance de `spec.md`:
+   - ¿Abarca múltiples subsistemas o capas a la vez (ej. Modelos + Servicios + Vistas + Integraciones)?
+   - ¿Supera o superará las ~250 líneas al añadir casos extremos y contingencias?
+2. **Si la spec es demasiado amplia:**
+   - **Detente y propón de inmediato el Desglose de Spec y Roadmap**:
+   - Sugiere dividir la fase en `specs/roadmap.md` en **Subfases consistentes** (por módulo o por capa: ej. Subfase 1.1: Núcleo/Dominio, Subfase 1.2: Servicios/Red, Subfase 1.3: UI/Skeletons, Subfase 1.4: Seguridad/Abusos).
+   - Con la aprobación del usuario, actualiza `specs/roadmap.md` con las nuevas subfases y acota la spec actual **estrictamente a la primera subfase atómica**, delegando el resto.
+   - Si la spec ya está correctamente acotada a una subfase, procede directamente a la auditoría.
 
-1. **Elaboración del reporte**: Genera una lista estructurada y concisa de los hallazgos.
-2. **Entrevista al usuario**: Presenta estas dudas al usuario de forma clara (preferiblemente numeradas o agrupadas) para que sea fácil responder a cada punto.
-3. **Recomienda soluciones**: Como analista experimentado, no solo hagas preguntas abiertas. Para cada laguna o ambigüedad, propón la solución técnica o de negocio más lógica, de manera que el usuario pueda simplemente confirmar tu recomendación.
+---
 
-## 3. Actualización de la Especificación
+## 1. Matriz de Auditoría 360° y Evaluación del "¿Qué pasaría sí...?"
 
-Una vez que el usuario responda y aclare las dudas:
-1. Actualiza directamente el archivo `spec.md`, reescribiendo las secciones necesarias para insertar la precisión acordada.
-2. Asegúrate de mover los escenarios complejos a la sección de **Casos extremos** y de crear nuevos **Criterios de aceptación** si la aclaración lo amerita.
-3. Informa al usuario que la especificación ha sido refinada, blindada y está lista para la fase de diseño técnico (`plan.md`) y construcción.
+Somete `spec.md` al análisis sistemático de estos dos bloques:
+
+### Bloque A: Auditoría de Ejes Transversales 360°
+1. **Contratos y Datos:** Tipos exactos, nulos/opcionales, límites de longitud (min/max), rangos numéricos y formatos.
+2. **Estados de UI y Skeletons:** Skeletons estructurales para cargas asíncronas, empty states descriptivos y feedback contextual.
+3. **Formularios y Pérdida de Datos:** Advertencia ante salida con cambios (*dirty state*) y persistencia de borradores (*draft auto-save*).
+4. **Red y Resiliencia:** Tolerancia a desconexión, modo offline o caché local, reintentos pasivos en background (backoff con jitter).
+5. **Seguridad y Control de Abusos:** Debounce en botones de envío (contra doble clic), rate-limiting y validación estricta de esquemas.
+6. **Dependencias:** Verificación de versiones `latest stable` compatibles evitando paquetes obsoletos.
+
+### Bloque B: Evaluación de Escenarios "¿Qué pasaría sí...?" (What-If Stress Testing)
+Formula y audita rigurosamente las siguientes preguntas de contingencia:
+- **¿Qué pasaría si la red se corta o degrada justo durante la operación?** (¿Queda la transacción a medias? ¿Se duplica? ¿Se informa al usuario con opción de reintentar?).
+- **¿Qué pasaría si el usuario interrumpe abruptamente?** (¿Presiona 'Atrás', recarga F5 o cierra la pestaña con un formulario o proceso en curso?).
+- **¿Qué pasaría si expira la sesión o token de autenticación durante el flujo?** (¿Se pierde el trabajo hecho o se renueva en background / se guarda el borrador antes de redirigir a login?).
+- **¿Qué pasaría si hay concurrencia o doble clic rápido?** (¿Dos solicitudes simultáneas pueden desincronizar el estado o crear registros duplicados? ¿Hay riesgo de *race condition*?).
+- **¿Qué pasaría si el backend o servicio de terceros tarda 30s+ o responde con error 500/503?** (¿La UI queda congelada con un spinner infinito o degrada limpiamente informando con honestidad?).
+- **¿Qué pasaría si el almacenamiento local falla o está deshabilitado?** (¿El modo incógnito o cuota excedida de localStorage crashea la app o se usa un fallback en memoria?).
+- **¿Qué pasaría si ingresan datos atípicos, malformados o extremos?** (Strings gigantes, caracteres especiales, números negativos en cantidades, fechas imposibles).
+
+---
+
+## 2. Presentación del Reporte Explicativo (Fundamentado para Decidir)
+
+No presentes una lista escueta ni hagas preguntas abiertas a cuentagotas. Estructura el reporte de forma **didáctica y explicativa**, agrupado por hallazgos:
+
+```markdown
+### 📋 Hallazgo [ID]: [Título descriptivo]
+- **Eje / Escenario:** [ej. Red & Resiliencia / ¿Qué pasaría si se corta la red?]
+- **Qué se detectó (Laguna):** [Descripción clara del vacío o ambigüedad en spec.md]
+- **Por qué importa / Riesgo e Impacto:** [Explicación del riesgo real si no se define: pérdida de datos, cobros duplicados, congelamiento de UI, confusión del usuario, etc.]
+- **Alternativas consideradas:**
+  - *Opción A:* [Descripción de alternativa 1 y sus pros/contras]
+  - *Opción B:* [Descripción de alternativa 2 y sus pros/contras]
+- **Recomendación fundamentada:** [Por qué el analista recomienda la opción seleccionada (balance entre valor, UX y complejidad técnica)]
+- **Texto propuesto para `spec.md`:**
+  > [Redacción exacta lista para insertar en Criterios de Aceptación, RNF o Casos Extremos]
+```
+
+*(Opcionalmente, acompaña los hallazgos detallados con una tabla resumen que sintetice ID, Eje, Recomendación y Archivo afectado).*
+
+---
+
+## 3. Opciones de Decisión para el Usuario (Zero-Friction)
+
+Al final del reporte explicativo, presenta claramente estas dos opciones de cierre:
+- **Opción A (Aprobación Rápida en Bloque - Recomendada):** Si tras leer las justificaciones estás de acuerdo con el criterio del analista, responde simplemente: *"Acepto todas las recomendaciones"*. Todas las soluciones se aplicarán automáticamente a `spec.md`.
+- **Opción B (Decisión Selectiva / Ajustes):** Si prefieres una alternativa distinta para algún punto concreto, solo menciona el ID y tu elección (ej. *"Para H-02 prefiero la Opción A en vez de la B, el resto aprobado"*).
+
+---
+
+## 4. Actualización y Blindaje de `spec.md`
+
+Tras la respuesta del usuario (generalmente en un único mensaje de resolución):
+1. **Reescribe y blinda `spec.md` directamente**:
+   - Inserta las soluciones en los **Criterios de Aceptación** (`CA-X`).
+   - Completa los **Requisitos No Funcionales** (Conectividad, Skeletons, Formularios, Seguridad).
+   - Inserta los escenarios evaluados en **Casos extremos y Escenarios "¿Qué pasaría si...?"** (`CE-X`).
+2. **Actualiza el Changelog**: Añade una entrada en `## Changelog de la Especificación` resumiendo el refinamiento explicativo.
+3. **Cierre de la Skill**: Notifica al usuario que la especificación ha quedado blindada y lista para `plan` sin requerir más rondas de interacción.

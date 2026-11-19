@@ -21,7 +21,48 @@ REQUIRED_SECTIONS = {
     ]
 }
 
+def validate_harness_compatibility():
+    """Valida la compatibilidad multi-harness (Antigravity, Codex, Claude)."""
+    has_errors = False
+    print("Validando compatibilidad multi-harness (Antigravity / Codex / Claude)...")
+
+    # Archivos maestros requeridos
+    required_root_files = ["AGENTS.md", "CLAUDE.md", "GEMINI.md"]
+    for rf in required_root_files:
+        if not os.path.exists(rf):
+            print(f"  [X] Falta archivo de instrucciones maestro: {rf}")
+            has_errors = True
+        else:
+            print(f"  [✓] {rf} presente")
+
+    # Carpetas de skills
+    claude_dir = os.path.join(".claude", "skills")
+    agents_dir = os.path.join(".agents", "skills")
+
+    claude_skills = set(os.listdir(claude_dir)) if os.path.exists(claude_dir) else set()
+    agents_skills = set(os.listdir(agents_dir)) if os.path.exists(agents_dir) else set()
+
+    if not claude_skills:
+        print(f"  [X] Falta directorio o skills en {claude_dir}")
+        has_errors = True
+    if not agents_skills:
+        print(f"  [X] Falta directorio o skills en {agents_dir} (Requerido para Antigravity y Codex)")
+        has_errors = True
+
+    if claude_skills and agents_skills:
+        diff = claude_skills.symmetric_difference(agents_skills)
+        if diff:
+            print(f"  [!] Advertencia: Desincronización de skills detectada: {diff}. Ejecuta 'python scripts/sync_skills.py'.")
+            has_errors = True
+        else:
+            print(f"  [✓] Skills sincronizadas entre {claude_dir} y {agents_dir} ({len(claude_skills)} skills)")
+
+    return not has_errors
+
 def validate_specs():
+    if not validate_harness_compatibility():
+        print("\nAdvertencia en compatibilidad multi-harness. Revisa los mensajes arriba.")
+
     specs_dir = "specs"
     if not os.path.exists(specs_dir):
         print(f"Error: No se encontró el directorio '{specs_dir}'")
@@ -83,6 +124,10 @@ def validate_specs():
                     has_errors = True
                 else:
                     print(f"  [✓] {file_name} verificado correctamente")
+
+                # Comprobación de calidad: Grupos lógicos en tasks.md
+                if file_name == "tasks.md" and "### Grupo " not in content:
+                    print("  [!] Recomendación: En tasks.md no se detectaron '### Grupo '. Organiza las tareas en grupos lógicos para facilitar revisiones y commits parciales.")
             except Exception as e:
                 print(f"  [X] Error leyendo {file_name}: {e}")
                 has_errors = True
