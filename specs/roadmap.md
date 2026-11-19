@@ -45,19 +45,19 @@ Dividido rigurosamente en subfases por módulo o por capa para mantener especifi
 
 ---
 
-## Fase 2: Expansión y Nuevas Capacidades
-
-### Subfase 2.1: Módulo Complementario A
-- [ ] Funcionalidad Complementaria 1 (Backend / Dominio)
-- [ ] Interfaz y Skeletons de Módulo Complementario 1
-
-### Subfase 2.2: Módulo Complementario B
-- [ ] Funcionalidad Complementaria 2
+## Fase 2: Expansión
+- [ ] **Subfase 2.1: Funcionalidad Complementaria 1**
+  - [ ] Backend y Dominio de Módulo Complementario 1
+  - [ ] Interfaz y Skeletons de Módulo Complementario 1
+- [ ] **Subfase 2.2: Funcionalidad Complementaria 2**
+  - [ ] Integración y lógica de Módulo Complementario 2
 
 ---
 
-## Fase 3: Escala y Optimización
-- [ ] **Subfase 3.1:** Métricas de rendimiento, optimización de caché y robustez de red
+## Fase 3: Monetización o Escala
+- [ ] **Subfase 3.1: Funcionalidad Avanzada / Escala**
+  - [ ] Funcionalidad avanzada y monetización
+  - [ ] Métricas de rendimiento, optimización de caché y robustez de red
 
 ---
 
